@@ -1,9 +1,12 @@
 use clap::Parser as _;
 use qr_drop::config::Cli;
+use qr_drop::ensure_in_path;
 use qr_drop::server::start_server;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    ensure_in_path();
+
     let cli = Cli::parse();
 
     let (payload, server_config) = match cli.resolve() {

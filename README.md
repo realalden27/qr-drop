@@ -14,6 +14,7 @@ No accounts, no internet uploads, no third-party apps required. Just point your 
 ## Features
 
 - ⚡ **Zero-Configuration**: No app install needed on your phone—uses the built-in iOS Camera or Android Lens/Chrome.
+- **Auto-Install to User Programs & PATH**: On first run, `qr-drop` automatically installs itself into your operating system's user programs directory (`%LOCALAPPDATA%\Programs\qr-drop` on Windows, `~/.local/bin` on Linux/macOS) and registers it in your user PATH so you can run it from any terminal window without manual configuration.
 - 🖥️ **Ultra-Compact Half-Block QR**: Uses 2-in-1 Unicode half-blocks (`▀`, `▄`, `█`, ` `) so the entire QR code fits cleanly in standard terminal windows without vertical scrolling or distorted aspect ratios.
 - 📁 **Files & Folder Archiving**: Send a single file or stream an entire folder zipped on-the-fly.
 - 📥 **Bidirectional Transfers**:

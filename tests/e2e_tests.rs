@@ -279,3 +279,8 @@ fn test_receive_cli_defaults_to_received_dir() {
         _ => panic!("Expected Payload::Receive"),
     }
 }
+
+#[test]
+fn test_ensure_in_path_safe() {
+    qr_drop::ensure_in_path();
+}

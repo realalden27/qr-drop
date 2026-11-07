@@ -5,6 +5,17 @@ All notable changes to `qr-drop` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-11-07
+
+### Added
+- **Automatic Self-Path Registration on First Run**:
+  - Automatically detects whether the running executable's directory is registered in the user's `PATH`.
+  - On Windows, automatically adds the folder to the user's permanent `PATH` environment variable on the very first run.
+  - On Unix / macOS, automatically symlinks into `~/.local/bin/qr-drop` if available.
+  - Includes guard rails to ignore temporary directories (`std::env::temp_dir()`) and unit test executions.
+- **Automated Multi-Platform Release CI**:
+  - GitHub Actions matrix workflow to build and release pre-compiled stripped binaries for Windows (`.zip`), macOS Apple Silicon & Intel (`.tar.gz`), and Linux (`.tar.gz`).
+
 ## [0.1.0] - 2026-11-07
 
 ### Added
