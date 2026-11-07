@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bidirectional Peer-to-Peer Local Network Sharing**:
   - `qr-drop <path>` / `qr-drop send <path>`: Instant file or directory sending.
   - Automatic on-the-fly streaming zip archive creation for entire directory trees.
-  - `qr-drop receive [output_dir]`: Mobile web UI for uploading files, camera photos, and text notes directly onto the host PC.
+  - `qr-drop receive [output_dir]`: Mobile web UI for uploading files, camera photos, and text notes directly onto the host PC. Defaults to the gitignored `received/` directory.
+  - Native OS desktop notification on transfer completion and automatic file manager opening focused on the received destination (with `--no-open` and `--no-notify` toggles).
   - `qr-drop text <message>`: Ephemeral text snippet sharing with mobile clipboard one-tap copy button.
 - **Ultra-Compact Unicode Terminal QR Codes**:
   - 2-in-1 vertical half-block (`▀`, `▄`, `█`, ` `) module rendering for perfect square aspect ratio in terminals.

@@ -26,6 +26,10 @@ pub enum Payload {
     Receive {
         /// Output directory to store received files.
         output_dir: PathBuf,
+        /// Whether to automatically open the destination folder in file manager upon receiving files.
+        open: bool,
+        /// Whether to display a desktop notification upon receiving files.
+        notify: bool,
     },
     /// Displaying a text snippet for easy copying on mobile.
     Text {
@@ -121,7 +125,7 @@ pub async fn start_server(payload: Payload, config: ServerConfig) -> Result<()> 
                 ),
             )
         },
-        Payload::Receive { output_dir } => (
+        Payload::Receive { output_dir, .. } => (
             "u",
             format!("  📥 Ready to receive into: {}", output_dir.display()),
         ),

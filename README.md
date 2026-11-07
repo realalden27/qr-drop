@@ -59,7 +59,10 @@ qr-drop ./vacation_photos
 ```bash
 qr-drop receive
 ```
-Scan the QR code to open an upload page on your phone. You can pick photos, take new photos directly with your camera, select documents, or type a text note. Received files are saved in the `received/` folder (or custom folder: `qr-drop receive ./downloads`).
+Scan the QR code to open an upload page on your phone. You can pick photos, take new photos directly with your camera, select documents, or type a text note.
+- Received files are saved in the `received/` folder (which is automatically `.gitignore`d).
+- When the transfer completes, a **desktop notification** alerts you, and your system's **File Explorer / Finder automatically opens** the `received/` folder!
+- Flags: pass `--no-open` to suppress opening the folder, or `--no-notify` to suppress the notification.
 
 ### 4. Share a Text Snippet or Link
 ```bash

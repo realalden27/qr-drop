@@ -151,6 +151,8 @@ async fn test_upload_files_and_note_e2e() {
         token: token.clone(),
         payload: Payload::Receive {
             output_dir: out_dir.clone(),
+            open: false,
+            notify: false,
         },
         shutdown_tx: None,
     };
@@ -261,7 +263,13 @@ fn test_receive_cli_defaults_to_received_dir() {
     let cli = qr_drop::config::Cli::parse_from(["qr-drop", "receive"]);
     let (payload, _) = cli.resolve().unwrap();
     match payload {
-        Payload::Receive { output_dir } => {
+        Payload::Receive {
+            output_dir,
+            open,
+            notify,
+        } => {
+            assert!(open, "Default receive must have open=true");
+            assert!(notify, "Default receive must have notify=true");
             assert!(
                 output_dir.ends_with("received"),
                 "Default receive output dir must end with 'received', got: {}",

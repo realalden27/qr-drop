@@ -59,6 +59,18 @@ pub enum Commands {
         /// Destination folder to save received files (default: "received" folder)
         #[arg(value_name = "OUTPUT_DIR", default_value = "received")]
         output: PathBuf,
+
+        /// Automatically open destination folder in file manager (default: true)
+        #[arg(short = 'o', long)]
+        open: bool,
+
+        /// Do not automatically open the destination folder after receiving files
+        #[arg(long)]
+        no_open: bool,
+
+        /// Do not show a desktop notification after receiving files
+        #[arg(long)]
+        no_notify: bool,
     },
     /// Share a text snippet, URL, or note
     Text {
@@ -106,7 +118,15 @@ impl Cli {
                     is_dir,
                 }
             },
-            (Some(Commands::Receive { output }), _) => {
+            (
+                Some(Commands::Receive {
+                    output,
+                    open: _,
+                    no_open,
+                    no_notify,
+                }),
+                _,
+            ) => {
                 let out = if output.is_relative() {
                     match std::env::current_dir() {
                         Ok(cd) => cd.join(output),
@@ -115,7 +135,11 @@ impl Cli {
                 } else {
                     output
                 };
-                Payload::Receive { output_dir: out }
+                Payload::Receive {
+                    output_dir: out,
+                    open: !no_open,
+                    notify: !no_notify,
+                }
             },
             (Some(Commands::Text { content }), _) => {
                 let text = match content {

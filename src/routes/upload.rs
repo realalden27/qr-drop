@@ -83,8 +83,12 @@ pub async fn page_handler(State(state): State<AppState>) -> Response {
 
 /// Handler for incoming multipart form uploads (files and text).
 pub async fn upload_handler(State(state): State<AppState>, mut multipart: Multipart) -> Response {
-    let output_dir = match &state.payload {
-        Payload::Receive { output_dir } => output_dir.clone(),
+    let (output_dir, should_open, should_notify) = match &state.payload {
+        Payload::Receive {
+            output_dir,
+            open,
+            notify,
+        } => (output_dir.clone(), *open, *notify),
         _ => return StatusCode::NOT_FOUND.into_response(),
     };
 
@@ -219,6 +223,20 @@ pub async fn upload_handler(State(state): State<AppState>, mut multipart: Multip
 
     if saved_files_count == 0 && saved_text_count == 0 {
         return (StatusCode::BAD_REQUEST, "No files or text received.").into_response();
+    }
+
+    if should_notify {
+        let summary = if saved_files_count > 0 {
+            format!("qr-drop: Received {saved_files_count} file(s)")
+        } else {
+            "qr-drop: Received text note".to_string()
+        };
+        let body = format!("Saved in: {}", output_dir.display());
+        crate::notification::send_notification(&summary, &body);
+    }
+
+    if should_open {
+        crate::notification::open_folder(&output_dir);
     }
 
     let notify = state.shutdown_tx.clone();
