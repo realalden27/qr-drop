@@ -13,16 +13,17 @@ No accounts, no internet uploads, no third-party apps required. Just point your 
 
 ## Features
 
-- ⚡ **Zero-Configuration**: No app install needed on your phone—uses the built-in iOS Camera or Android Lens/Chrome.
+- **Zero-Configuration**: No app install needed on your phone—uses the built-in iOS Camera or Android Lens/Chrome.
 - **Auto-Install to User Programs & PATH**: On first run, `qr-drop` automatically installs itself into your operating system's user programs directory (`%LOCALAPPDATA%\Programs\qr-drop` on Windows, `~/.local/bin` on Linux/macOS) and registers it in your user PATH so you can run it from any terminal window without manual configuration.
-- 🖥️ **Ultra-Compact Half-Block QR**: Uses 2-in-1 Unicode half-blocks (`▀`, `▄`, `█`, ` `) so the entire QR code fits cleanly in standard terminal windows without vertical scrolling or distorted aspect ratios.
-- 📁 **Files & Folder Archiving**: Send a single file or stream an entire folder zipped on-the-fly.
-- 📥 **Bidirectional Transfers**:
+- **Auto-Upgrade & Self-Updating**: Automatically upgrades the installed binary when a newer version is executed, or run `qr-drop update` to fetch and install the latest release directly from GitHub Releases.
+- **Ultra-Compact Half-Block QR**: Uses 2-in-1 Unicode half-blocks (`▀`, `▄`, `█`, ` `) so the entire QR code fits cleanly in standard terminal windows without vertical scrolling or distorted aspect ratios.
+- **Files & Folder Archiving**: Send a single file or stream an entire folder zipped on-the-fly.
+- **Bidirectional Transfers**:
   - `qr-drop <file>`: Send a file or folder from your computer to your phone.
   - `qr-drop receive`: Receive photos, documents, and notes from your phone onto your computer.
   - `qr-drop text <message>`: Instantly copy text, URLs, or clipboard snippets onto your phone.
-- 🔒 **Local & Ephemeral**: Direct peer-to-peer Wi-Fi transfer. Shuts down automatically after a single transfer (or pass `-k` / `--keep-alive` to keep running).
-- 🛡️ **100% Panic-Free & Pure Rust**: Zero unsafe code (`forbid(unsafe_code)`), strictly linted against panics, indexing bounds violations, and unwraps.
+- **Local & Ephemeral**: Direct peer-to-peer Wi-Fi transfer. Shuts down automatically after a single transfer (or pass `-k` / `--keep-alive` to keep running).
+- **100% Panic-Free & Pure Rust**: Zero unsafe code (`forbid(unsafe_code)`), strictly linted against panics, indexing bounds violations, and unwraps.
 
 ---
 
@@ -75,6 +76,12 @@ git log -1 | qr-drop text -
 ```
 The phone displays a clean mobile card with a **"Copy to Clipboard"** button.
 
+### 5. Self-Update to Latest Version
+```bash
+qr-drop update
+```
+Checks GitHub Releases for the newest pre-compiled binary matching your OS and architecture, downloads the release, verifies it, and self-replaces the executable in-place.
+
 ---
 
 ## Command-Line Options
@@ -86,6 +93,7 @@ Commands:
   send     Share a file or folder with your phone [default]
   receive  Receive files or notes from your phone
   text     Share a text snippet, URL, or note
+  update   Check for updates and self-replace binary to the latest version
   help     Print this message or the help of the given subcommand(s)
 
 Arguments:

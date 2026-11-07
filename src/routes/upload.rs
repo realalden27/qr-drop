@@ -176,7 +176,7 @@ pub async fn upload_handler(State(state): State<AppState>, mut multipart: Multip
             }
 
             println!(
-                "  📥 Received: {} ({})",
+                "  Received: {} ({})",
                 target_path.display(),
                 crate::routes::download::format_filesize(file_bytes)
             );
@@ -204,7 +204,7 @@ pub async fn upload_handler(State(state): State<AppState>, mut multipart: Multip
                         }
 
                         println!(
-                            "  📝 Received Text Note:\n{trimmed}\n  -> Saved to: {}",
+                            "  Received Text Note:\n{trimmed}\n  -> Saved to: {}",
                             text_path.display()
                         );
                         saved_text_count = saved_text_count.saturating_add(1);

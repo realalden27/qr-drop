@@ -78,11 +78,27 @@ pub enum Commands {
         #[arg(value_name = "CONTENT")]
         content: Option<String>,
     },
+    /// Check for updates on GitHub and self-update to the latest release
+    Update,
+}
+
+/// The resolved execution action parsed from command-line arguments.
+#[derive(Debug)]
+pub enum CliAction {
+    /// Start the sharing server with the given payload and configuration.
+    Serve {
+        /// Sharing payload (send, receive, or text).
+        payload: Payload,
+        /// Server configuration.
+        config: ServerConfig,
+    },
+    /// Query GitHub Releases and perform an in-place self update.
+    Update,
 }
 
 impl Cli {
-    /// Resolves the CLI input into a `(Payload, ServerConfig)` tuple ready for execution.
-    pub fn resolve(self) -> Result<(Payload, ServerConfig)> {
+    /// Resolves the CLI input into a `CliAction` ready for execution.
+    pub fn resolve(self) -> Result<CliAction> {
         let server_config = ServerConfig {
             ip: self.ip,
             port: self.port,
@@ -93,7 +109,8 @@ impl Cli {
             },
         };
 
-        let payload = match (self.command, self.direct_path) {
+        let action = match (self.command, self.direct_path) {
+            (Some(Commands::Update), _) => CliAction::Update,
             (Some(Commands::Send { path }), _) | (None, Some(path)) => {
                 let canonical = match path.canonicalize() {
                     Ok(p) => p,
@@ -113,9 +130,12 @@ impl Cli {
                     )));
                 }
 
-                Payload::SendFile {
-                    path: canonical,
-                    is_dir,
+                CliAction::Serve {
+                    payload: Payload::SendFile {
+                        path: canonical,
+                        is_dir,
+                    },
+                    config: server_config,
                 }
             },
             (
@@ -135,10 +155,13 @@ impl Cli {
                 } else {
                     output
                 };
-                Payload::Receive {
-                    output_dir: out,
-                    open: !no_open,
-                    notify: !no_notify,
+                CliAction::Serve {
+                    payload: Payload::Receive {
+                        output_dir: out,
+                        open: !no_open,
+                        notify: !no_notify,
+                    },
+                    config: server_config,
                 }
             },
             (Some(Commands::Text { content }), _) => {
@@ -157,7 +180,10 @@ impl Cli {
                     return Err(QrDropError::invalid_path("Text snippet cannot be empty"));
                 }
 
-                Payload::Text { content: text }
+                CliAction::Serve {
+                    payload: Payload::Text { content: text },
+                    config: server_config,
+                }
             },
             (None, None) => {
                 return Err(QrDropError::invalid_path(
@@ -166,6 +192,6 @@ impl Cli {
             },
         };
 
-        Ok((payload, server_config))
+        Ok(action)
     }
 }

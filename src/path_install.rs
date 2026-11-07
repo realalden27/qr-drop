@@ -51,14 +51,40 @@ fn install_windows(current_exe: &Path) {
     let target_dir = local_app_data.join("Programs").join("qr-drop");
     let target_exe = target_dir.join("qr-drop.exe");
 
-    // Already running from the installed Programs location, or already installed
-    if target_exe.exists() || current_exe == target_exe {
+    // Already running from the installed Programs location
+    if current_exe == target_exe {
         return;
     }
 
     // If installed via cargo (.cargo\bin), it is already in a proper tools directory
     let current_str = current_exe.to_string_lossy();
     if current_str.contains(".cargo\\bin") || current_str.contains(".cargo/bin") {
+        return;
+    }
+
+    let current_ver_str = env!("CARGO_PKG_VERSION");
+    let current_ver = crate::update::parse_version(current_ver_str).unwrap_or((0, 0, 0));
+
+    if target_exe.exists() {
+        let output = std::process::Command::new(&target_exe)
+            .arg("--version")
+            .output();
+
+        if let Ok(out) = output {
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            if let Some(installed_ver) = crate::update::parse_version(&stdout) {
+                let is_newer = current_ver > installed_ver;
+                if is_newer && std::fs::copy(current_exe, &target_exe).is_ok() {
+                    let installed_clean = stdout.trim().trim_start_matches("qr-drop ").trim();
+                    println!(
+                        "  Updated qr-drop from v{} to v{} in '{}'.",
+                        installed_clean,
+                        current_ver_str,
+                        target_dir.display()
+                    );
+                }
+            }
+        }
         return;
     }
 
@@ -101,12 +127,38 @@ fn install_unix(current_exe: &Path) {
     let local_bin = home.join(".local").join("bin");
     let target_exe = local_bin.join("qr-drop");
 
-    // Already running from ~/.local/bin or already installed there
-    if target_exe.exists() || current_exe == target_exe {
+    // Already running from ~/.local/bin
+    if current_exe == target_exe {
         return;
     }
     let current_str = current_exe.to_string_lossy();
     if current_str.contains(".cargo/bin") {
+        return;
+    }
+
+    let current_ver_str = env!("CARGO_PKG_VERSION");
+    let current_ver = crate::update::parse_version(current_ver_str).unwrap_or((0, 0, 0));
+
+    if target_exe.exists() {
+        let output = std::process::Command::new(&target_exe)
+            .arg("--version")
+            .output();
+
+        if let Ok(out) = output {
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            if let Some(installed_ver) = crate::update::parse_version(&stdout) {
+                let is_newer = current_ver > installed_ver;
+                if is_newer && std::fs::copy(current_exe, &target_exe).is_ok() {
+                    let installed_clean = stdout.trim().trim_start_matches("qr-drop ").trim();
+                    println!(
+                        "  Updated qr-drop from v{} to v{} in '{}'.",
+                        installed_clean,
+                        current_ver_str,
+                        local_bin.display()
+                    );
+                }
+            }
+        }
         return;
     }
 

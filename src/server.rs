@@ -120,14 +120,14 @@ pub async fn start_server(payload: Payload, config: ServerConfig) -> Result<()> 
             (
                 "d",
                 format!(
-                    "  📦 Sharing {kind}: {name} ({})",
+                    "  Sharing {kind}: {name} ({})",
                     routes::download::format_filesize(size)
                 ),
             )
         },
         Payload::Receive { output_dir, .. } => (
             "u",
-            format!("  📥 Ready to receive into: {}", output_dir.display()),
+            format!("  Ready to receive into: {}", output_dir.display()),
         ),
         Payload::Text { content } => {
             let preview = if content.len() > 40 {
@@ -137,7 +137,7 @@ pub async fn start_server(payload: Payload, config: ServerConfig) -> Result<()> 
             } else {
                 content.clone()
             };
-            ("t", format!("  📝 Sharing text: \"{preview}\""))
+            ("t", format!("  Sharing text: \"{preview}\""))
         },
     };
 
@@ -160,15 +160,15 @@ pub async fn start_server(payload: Payload, config: ServerConfig) -> Result<()> 
 
     println!();
     println!("{qr_str}");
-    println!("  🔗 Scan QR code above, or open in mobile browser:");
+    println!("  Scan QR code above, or open in mobile browser:");
     println!("     {target_url}");
     println!();
     println!("{summary_line}");
 
     if config.keep_alive {
-        println!("  🔄 Server running in persistent mode. Press Ctrl+C to stop.");
+        println!("  Server running in persistent mode. Press Ctrl+C to stop.");
     } else {
-        println!("  ⚡ Server will automatically shut down after transfer completes.");
+        println!("  Server will automatically shut down after transfer completes.");
         println!("     (Use --keep-alive / -k to keep the server running)");
     }
     println!();
@@ -177,10 +177,10 @@ pub async fn start_server(payload: Payload, config: ServerConfig) -> Result<()> 
         .with_graceful_shutdown(async move {
             tokio::select! {
                 _ = tokio::signal::ctrl_c() => {
-                    println!("\n  🛑 Interrupted (Ctrl+C). Server stopped.");
+                    println!("\n  Interrupted (Ctrl+C). Server stopped.");
                 }
                 _ = shutdown_rx.recv() => {
-                    println!("\n  ✨ Transfer complete! Shutting down server.");
+                    println!("\n  Transfer complete. Shutting down server.");
                 }
             }
         })

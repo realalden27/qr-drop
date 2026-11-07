@@ -5,6 +5,15 @@ All notable changes to `qr-drop` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-11-07
+
+### Added
+- **Auto-Upgrade on Newer Binary Run**: When running a newer `qr-drop` binary outside the Programs directory, it automatically detects the version difference, updates the installed Programs folder binary, and prints an upgrade notice.
+- **In-App Self-Updater (`qr-drop update`)**: Built-in `update` subcommand that queries the GitHub Releases API for the latest release, downloads the platform-specific pre-compiled archive, and performs an in-place self-replacement.
+
+### Changed
+- Replaced web template icons with clean vector SVGs and ensured 100% emoji-free terminal output.
+
 ## [0.1.2] - 2026-11-07
 
 ### Changed

@@ -261,23 +261,40 @@ async fn test_text_snippet_e2e() {
 fn test_receive_cli_defaults_to_received_dir() {
     use clap::Parser as _;
     let cli = qr_drop::config::Cli::parse_from(["qr-drop", "receive"]);
-    let (payload, _) = cli.resolve().unwrap();
-    match payload {
-        Payload::Receive {
-            output_dir,
-            open,
-            notify,
-        } => {
-            assert!(open, "Default receive must have open=true");
-            assert!(notify, "Default receive must have notify=true");
-            assert!(
-                output_dir.ends_with("received"),
-                "Default receive output dir must end with 'received', got: {}",
-                output_dir.display()
-            );
+    let action = cli.resolve().unwrap();
+    match action {
+        qr_drop::CliAction::Serve { payload, .. } => match payload {
+            Payload::Receive {
+                output_dir,
+                open,
+                notify,
+            } => {
+                assert!(open, "Default receive must have open=true");
+                assert!(notify, "Default receive must have notify=true");
+                assert!(
+                    output_dir.ends_with("received"),
+                    "Default receive output dir must end with 'received', got: {}",
+                    output_dir.display()
+                );
+            },
+            _ => panic!("Expected Payload::Receive"),
         },
-        _ => panic!("Expected Payload::Receive"),
+        _ => panic!("Expected CliAction::Serve"),
     }
+}
+
+#[test]
+fn test_parse_version() {
+    assert_eq!(qr_drop::update::parse_version("0.1.2"), Some((0, 1, 2)));
+    assert_eq!(qr_drop::update::parse_version("v1.0.0"), Some((1, 0, 0)));
+    assert_eq!(
+        qr_drop::update::parse_version("v2.3.4-rc.1"),
+        Some((2, 3, 4))
+    );
+    assert_eq!(
+        qr_drop::update::parse_version("qr-drop 0.1.1"),
+        Some((0, 1, 1))
+    );
 }
 
 #[test]

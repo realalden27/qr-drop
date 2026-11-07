@@ -145,11 +145,13 @@
 </head>
 <body>
   <div class="card" id="form-container">
-    <h1>📤 Send to PC</h1>
+    <h1>Send to PC</h1>
     <p class="subtitle">Select files, take a photo, or paste text</p>
 
     <div class="dropzone" id="dropzone">
-      <div class="dropzone-icon">📁</div>
+      <div class="dropzone-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
       <div class="dropzone-text" id="dropzone-label">Tap to Choose Files / Photos</div>
       <input type="file" id="file-input" class="file-input" multiple>
     </div>
@@ -167,7 +169,9 @@
   </div>
 
   <div class="card success-card" id="success-container">
-    <div class="success-icon">✔</div>
+    <div class="success-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
     <h1>Sent to PC!</h1>
     <p class="subtitle" id="success-details">Files received successfully.</p>
     <button type="button" class="btn" onclick="resetForm()">Send More</button>

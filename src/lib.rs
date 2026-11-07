@@ -10,11 +10,13 @@ pub mod path_install;
 pub mod qr;
 pub mod routes;
 pub mod server;
+pub mod update;
 
-pub use config::{Cli, Commands};
+pub use config::{Cli, CliAction, Commands};
 pub use error::{QrDropError, Result};
 pub use ip::{detect_local_ip, resolve_ip};
 pub use notification::{open_folder, send_notification};
 pub use path_install::ensure_in_path;
 pub use qr::{QrOptions, render_terminal_qr};
 pub use server::{AppState, Payload, ServerConfig, create_router, start_server};
+pub use update::check_and_update;
