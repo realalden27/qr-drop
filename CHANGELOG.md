@@ -5,6 +5,15 @@ All notable changes to `qr-drop` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-11-07
+
+### Fixed
+- **Release CI Runner Queue**: Migrated macOS runner for `x86_64-apple-darwin` from deprecated `macos-13` to `macos-latest` (Apple Silicon with Universal cross-compilation), eliminating queue hang in GitHub Actions release matrix.
+
+### Added
+- **Dual crates.io and GitHub Update Resolution**: `qr-drop update` now simultaneously inspects the crates.io API and GitHub Releases API.
+- **Cargo-Aware Self-Update**: Detects if `qr-drop` was installed via Cargo (`.cargo/bin`) and automatically executes `cargo install qr-drop` to perform the update.
+
 ## [0.1.3] - 2026-11-07
 
 ### Added

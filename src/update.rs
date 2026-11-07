@@ -14,6 +14,22 @@ struct GitHubAsset {
     browser_download_url: String,
 }
 
+#[derive(serde::Deserialize, Debug)]
+struct CratesResponse {
+    #[serde(rename = "crate")]
+    krate: Option<CrateMeta>,
+}
+
+#[derive(serde::Deserialize, Debug)]
+struct CrateMeta {
+    max_version: Option<String>,
+}
+
+fn is_cargo_install(exe: &std::path::Path) -> bool {
+    exe.components()
+        .any(|c| c.as_os_str().to_string_lossy().contains(".cargo"))
+}
+
 /// Parses a semver version string (e.g. "0.1.2", "v0.1.2", or "qr-drop 0.1.2") into (major, minor, patch).
 #[must_use]
 pub fn parse_version(s: &str) -> Option<(u64, u64, u64)> {
@@ -64,43 +80,91 @@ pub fn get_target_triple() -> &'static str {
     }
 }
 
-/// Checks GitHub Releases and updates the running binary if a newer release exists.
+/// Checks crates.io and GitHub Releases and updates the running binary if a newer release exists.
 pub async fn check_and_update() -> Result<()> {
     let current_version_str = env!("CARGO_PKG_VERSION");
     let current_version = parse_version(current_version_str).unwrap_or((0, 0, 0));
 
-    println!("Checking for updates on GitHub...");
+    println!("Checking for updates on crates.io and GitHub...");
 
     let client = reqwest::Client::builder()
-        .user_agent(format!("qr-drop/{current_version_str}"))
+        .user_agent(format!(
+            "qr-drop/{current_version_str} (https://github.com/realalden27/qr-drop)"
+        ))
         .build()
         .map_err(|e| QrDropError::network(format!("Failed to build HTTP client: {e}")))?;
 
-    let url = "https://api.github.com/repos/realalden27/qr-drop/releases/latest";
-    let resp =
-        client.get(url).send().await.map_err(|e| {
-            QrDropError::network(format!("Failed to query GitHub Releases API: {e}"))
-        })?;
+    // 1. Query crates.io API
+    let crates_url = "https://crates.io/api/v1/crates/qr-drop";
+    let crates_version = match client.get(crates_url).send().await {
+        Ok(resp) if resp.status().is_success() => {
+            if let Ok(data) = resp.json::<CratesResponse>().await {
+                data.krate.and_then(|k| k.max_version)
+            } else {
+                None
+            }
+        },
+        _ => None,
+    };
 
-    if !resp.status().is_success() {
-        return Err(QrDropError::network(format!(
-            "GitHub API returned error: HTTP {}",
-            resp.status()
-        )));
-    }
+    // 2. Query GitHub Releases API
+    let github_url = "https://api.github.com/repos/realalden27/qr-drop/releases/latest";
+    let release: Option<GitHubRelease> = match client.get(github_url).send().await {
+        Ok(resp) if resp.status().is_success() => resp.json::<GitHubRelease>().await.ok(),
+        _ => None,
+    };
 
-    let release: GitHubRelease = resp
-        .json()
-        .await
-        .map_err(|e| QrDropError::network(format!("Failed to parse GitHub release data: {e}")))?;
+    let latest_github_version_str = release
+        .as_ref()
+        .map(|r| r.tag_name.trim().trim_start_matches('v').to_string());
 
-    let latest_version_str = release.tag_name.trim().trim_start_matches('v');
-    let latest_version = parse_version(latest_version_str).unwrap_or((0, 0, 0));
+    let github_parsed = latest_github_version_str
+        .as_deref()
+        .and_then(parse_version)
+        .unwrap_or((0, 0, 0));
+    let crates_parsed = crates_version
+        .as_deref()
+        .and_then(parse_version)
+        .unwrap_or((0, 0, 0));
 
-    if latest_version <= current_version {
+    let max_available = std::cmp::max(github_parsed, crates_parsed);
+
+    if max_available <= current_version {
         println!("qr-drop is already up to date (v{current_version_str}).");
         return Ok(());
     }
+
+    let target_version_str = if crates_parsed >= github_parsed {
+        crates_version.as_deref().unwrap_or(current_version_str)
+    } else {
+        latest_github_version_str
+            .as_deref()
+            .unwrap_or(current_version_str)
+    };
+
+    println!("Found newer version v{target_version_str} (current: v{current_version_str}).");
+
+    // If currently running from a cargo installation (.cargo/bin), update via cargo install
+    if std::env::current_exe().is_ok_and(|p| is_cargo_install(&p)) {
+        println!("Updating via cargo install qr-drop...");
+        let status = std::process::Command::new("cargo")
+            .args(["install", "qr-drop"])
+            .status();
+        if matches!(status, Ok(s) if s.success()) {
+            println!("Successfully updated qr-drop via cargo to v{target_version_str}!");
+            return Ok(());
+        }
+        println!("cargo install failed or cargo not found; attempting GitHub binary download...");
+    }
+
+    let release = match release {
+        Some(r) => r,
+        None => {
+            return Err(QrDropError::network(
+                "New version detected on crates.io, but GitHub Releases could not be reached. Run 'cargo install qr-drop' to update.".to_string(),
+            ));
+        },
+    };
 
     let target = get_target_triple();
     let matching_asset = release.assets.iter().find(|a| a.name.contains(target));
