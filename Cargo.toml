@@ -1,0 +1,69 @@
+[package]
+name = "qr-drop"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Instant PC <-> Phone file, folder, and text sharing via terminal QR code in pure Rust."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/realalden27/qr-drop"
+homepage = "https://github.com/realalden27/qr-drop"
+readme = "README.md"
+keywords = ["qr-code", "file-sharing", "cli", "peer-to-peer", "local-network"]
+categories = ["command-line-utilities", "network-programming"]
+include = [
+    "/src/**",
+    "/tests/**",
+    "/LICENSE-*",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/Cargo.toml",
+]
+
+[lib]
+name = "qr_drop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "qr-drop"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive", "env"] }
+tokio = { version = "1.43", features = ["macros", "rt-multi-thread", "time", "signal", "net", "io-util", "fs"] }
+tokio-util = { version = "0.7", features = ["io"] }
+axum = { version = "0.8", features = ["multipart"] }
+tower-http = { version = "0.6", features = ["cors", "trace"] }
+qrcode = { version = "0.14", default-features = false }
+thiserror = "2.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+zip = { version = "2.2", default-features = false, features = ["deflate"] }
+mime_guess = "2.0"
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+crossterm = "0.29"
+
+[dev-dependencies]
+reqwest = { version = "0.12", features = ["multipart", "stream"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+unreachable_pub = "warn"
+unused_imports = "deny"
+unused_must_use = "deny"
+unused_mut = "deny"
+unused_variables = "deny"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+unreachable = "deny"
+indexing_slicing = "deny"
+wildcard_imports = "deny"
+dbg_macro = "deny"
+cognitive_complexity = "deny"

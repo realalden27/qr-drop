@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Send to PC - qr-drop</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --border: #334155;
+      --error: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: var(--subtext);
+      font-size: 0.875rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 0.75rem;
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 1.25rem;
+      transition: all 0.2s ease;
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    .dropzone:hover, .dropzone.active {
+      border-color: var(--accent);
+      background-color: rgba(16, 185, 129, 0.05);
+    }
+    .dropzone-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .dropzone-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .file-input { display: none; }
+    .file-list {
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--accent);
+      max-height: 100px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    textarea {
+      width: 100%;
+      height: 90px;
+      background-color: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: none;
+      margin-bottom: 1.25rem;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.875rem 1.5rem;
+      background-color: var(--accent);
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 0.75rem;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    .btn:hover:not(:disabled) { background-color: var(--accent-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 1rem;
+      display: none;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: var(--accent);
+      transition: width 0.1s linear;
+    }
+    .status-msg {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    .success-card {
+      display: none;
+      text-align: center;
+    }
+    .success-icon {
+      font-size: 3.5rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="form-container">
+    <h1>📤 Send to PC</h1>
+    <p class="subtitle">Select files, take a photo, or paste text</p>
+
+    <div class="dropzone" id="dropzone">
+      <div class="dropzone-icon">📁</div>
+      <div class="dropzone-text" id="dropzone-label">Tap to Choose Files / Photos</div>
+      <input type="file" id="file-input" class="file-input" multiple>
+    </div>
+
+    <div class="file-list" id="file-list"></div>
+
+    <textarea id="text-input" placeholder="Or paste notes, links, or text to send..."></textarea>
+
+    <button type="button" class="btn" id="send-btn">Send to PC</button>
+
+    <div class="progress-bar-container" id="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="status-msg" id="status-msg"></div>
+  </div>
+
+  <div class="card success-card" id="success-container">
+    <div class="success-icon">✔</div>
+    <h1>Sent to PC!</h1>
+    <p class="subtitle" id="success-details">Files received successfully.</p>
+    <button type="button" class="btn" onclick="resetForm()">Send More</button>
+  </div>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const textInput = document.getElementById('text-input');
+    const sendBtn = document.getElementById('send-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const statusMsg = document.getElementById('status-msg');
+    const formContainer = document.getElementById('form-container');
+    const successContainer = document.getElementById('success-container');
+    const successDetails = document.getElementById('success-details');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      const files = Array.from(fileInput.files);
+      if (files.length > 0) {
+        document.getElementById('dropzone-label').textContent = `${files.length} file(s) selected`;
+        fileList.innerHTML = files.map(f => `• ${f.name} (${(f.size/1024/1024).toFixed(1)} MB)`).join('<br>');
+      } else {
+        document.getElementById('dropzone-label').textContent = 'Tap to Choose Files / Photos';
+        fileList.innerHTML = '';
+      }
+    });
+
+    sendBtn.addEventListener('click', () => {
+      const files = fileInput.files;
+      const text = textInput.value.trim();
+
+      if (files.length === 0 && !text) {
+        alert('Please choose at least one file or enter some text.');
+        return;
+      }
+
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+      if (text) {
+        formData.append('text', text);
+      }
+
+      sendBtn.disabled = true;
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
+      statusMsg.textContent = 'Uploading...';
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '{{UPLOAD_URL}}', true);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          progressBar.style.width = percent + '%';
+          statusMsg.textContent = `Uploading: ${percent}%`;
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          formContainer.style.display = 'none';
+          successContainer.style.display = 'block';
+          successDetails.textContent = `${files.length} file(s) transferred successfully.`;
+        } else {
+          statusMsg.textContent = 'Upload failed: ' + xhr.responseText;
+          sendBtn.disabled = false;
+        }
+      };
+
+      xhr.onerror = () => {
+        statusMsg.textContent = 'Network error while transferring.';
+        sendBtn.disabled = false;
+      };
+
+      xhr.send(formData);
+    });
+
+    function resetForm() {
+      fileInput.value = '';
+      textInput.value = '';
+      fileList.innerHTML = '';
+      document.getElementById('dropzone-label').textContent = 'Tap to Choose Files / Photos';
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+      statusMsg.textContent = '';
+      sendBtn.disabled = false;
+      successContainer.style.display = 'none';
+      formContainer.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

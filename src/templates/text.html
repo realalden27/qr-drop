@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shared Snippet - qr-drop</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+      --accent: #818cf8;
+      --accent-hover: #6366f1;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .icon {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+    .text-box {
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text);
+      max-height: 240px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin-bottom: 1.5rem;
+      user-select: all;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.875rem 1.5rem;
+      background-color: var(--accent);
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 0.75rem;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    .btn:hover { background-color: var(--accent-hover); }
+    .footer {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--subtext);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📋</div>
+    <h1>Shared Snippet</h1>
+    <div class="text-box" id="snippet">{{CONTENT}}</div>
+    <button type="button" class="btn" id="copy-btn">Copy to Clipboard</button>
+    <div class="footer">Sent securely over local network via qr-drop</div>
+  </div>
+  <script>
+    const copyBtn = document.getElementById('copy-btn');
+    const snippet = document.getElementById('snippet');
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(snippet.innerText);
+        copyBtn.textContent = '✔ Copied to Clipboard!';
+        copyBtn.style.backgroundColor = '#10b981';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy to Clipboard';
+          copyBtn.style.backgroundColor = '';
+        }, 2000);
+      } catch (err) {
+        alert('Failed to copy: ' + err);
+      }
+    });
+  </script>
+</body>
+</html>
