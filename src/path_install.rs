@@ -51,8 +51,8 @@ fn install_windows(current_exe: &Path) {
     let target_dir = local_app_data.join("Programs").join("qr-drop");
     let target_exe = target_dir.join("qr-drop.exe");
 
-    // Already running from the installed Programs location or cargo bin
-    if current_exe == target_exe {
+    // Already running from the installed Programs location, or already installed
+    if target_exe.exists() || current_exe == target_exe {
         return;
     }
 
@@ -101,8 +101,8 @@ fn install_unix(current_exe: &Path) {
     let local_bin = home.join(".local").join("bin");
     let target_exe = local_bin.join("qr-drop");
 
-    // Already running from ~/.local/bin or ~/.cargo/bin
-    if current_exe == target_exe {
+    // Already running from ~/.local/bin or already installed there
+    if target_exe.exists() || current_exe == target_exe {
         return;
     }
     let current_str = current_exe.to_string_lossy();
