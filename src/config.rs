@@ -56,8 +56,8 @@ pub enum Commands {
     },
     /// Receive files or notes from your phone
     Receive {
-        /// Destination folder to save received files (default: current directory)
-        #[arg(value_name = "OUTPUT_DIR", default_value = ".")]
+        /// Destination folder to save received files (default: "received" folder)
+        #[arg(value_name = "OUTPUT_DIR", default_value = "received")]
         output: PathBuf,
     },
     /// Share a text snippet, URL, or note

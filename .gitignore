@@ -5,3 +5,7 @@
 # Environment & local secrets
 .env
 .env.*
+
+# Received transfers
+/received/
+/receive/

@@ -1,4 +1,4 @@
-#![allow(clippy::unwrap_used, clippy::expect_used)]
+#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
 use std::io::Read as _;
 use std::net::SocketAddr;
@@ -253,4 +253,21 @@ async fn test_text_snippet_e2e() {
     assert!(html.contains("&lt;token_1234&gt;&amp;abc"));
 
     server_handle.abort();
+}
+
+#[test]
+fn test_receive_cli_defaults_to_received_dir() {
+    use clap::Parser as _;
+    let cli = qr_drop::config::Cli::parse_from(["qr-drop", "receive"]);
+    let (payload, _) = cli.resolve().unwrap();
+    match payload {
+        Payload::Receive { output_dir } => {
+            assert!(
+                output_dir.ends_with("received"),
+                "Default receive output dir must end with 'received', got: {}",
+                output_dir.display()
+            );
+        },
+        _ => panic!("Expected Payload::Receive"),
+    }
 }
