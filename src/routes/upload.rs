@@ -151,6 +151,8 @@ pub async fn upload_handler(State(state): State<AppState>, mut multipart: Multip
                 match stream.chunk().await {
                     Ok(Some(chunk)) => {
                         if let Err(e) = destination.write_all(&chunk).await {
+                            drop(destination);
+                            let _ = tokio::fs::remove_file(&target_path).await;
                             return (
                                 StatusCode::INTERNAL_SERVER_ERROR,
                                 format!("Failed writing chunk to disk: {e}"),
@@ -161,6 +163,8 @@ pub async fn upload_handler(State(state): State<AppState>, mut multipart: Multip
                     },
                     Ok(None) => break,
                     Err(e) => {
+                        drop(destination);
+                        let _ = tokio::fs::remove_file(&target_path).await;
                         return (StatusCode::BAD_REQUEST, format!("Chunk read error: {e}"))
                             .into_response();
                     },
@@ -168,6 +172,8 @@ pub async fn upload_handler(State(state): State<AppState>, mut multipart: Multip
             }
 
             if let Err(e) = destination.flush().await {
+                drop(destination);
+                let _ = tokio::fs::remove_file(&target_path).await;
                 return (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     format!("Failed flushing file to disk: {e}"),

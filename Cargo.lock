@@ -1394,7 +1394,7 @@ dependencies = [
 
 [[package]]
 name = "qr-drop"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "axum",
  "clap",

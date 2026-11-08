@@ -221,6 +221,61 @@ async fn test_upload_files_and_note_e2e() {
 }
 
 #[tokio::test]
+async fn test_upload_large_file_e2e() {
+    let out_dir = create_temp_dir("upload_large");
+
+    let token = "testtoklarge".to_string();
+    let state = AppState {
+        token: token.clone(),
+        payload: Payload::Receive {
+            output_dir: out_dir.clone(),
+            open: false,
+            notify: false,
+        },
+        shutdown_tx: None,
+    };
+
+    let router = create_router(state);
+    let listener = tokio::net::TcpListener::bind(SocketAddr::from(([127, 0, 0, 1], 0)))
+        .await
+        .unwrap();
+    let port = listener.local_addr().unwrap().port();
+
+    let server_handle = tokio::spawn(async move {
+        axum::serve(listener, router).await.unwrap();
+    });
+
+    let client = reqwest::Client::new();
+    let large_data = vec![0x42u8; 25 * 1024 * 1024]; // 25 MB
+    let form = Form::new().part(
+        "files",
+        Part::bytes(large_data.clone()).file_name("large.bin"),
+    );
+
+    let post_resp = client
+        .post(format!("http://127.0.0.1:{port}/u/{token}"))
+        .multipart(form)
+        .send()
+        .await
+        .unwrap();
+
+    let status = post_resp.status();
+    let resp_text = post_resp.text().await.unwrap();
+    eprintln!("Response status: {status}, text: {resp_text}");
+    assert_eq!(status, reqwest::StatusCode::OK);
+
+    let uploaded_file = out_dir.join("large.bin");
+    assert!(uploaded_file.exists());
+    assert_eq!(
+        std::fs::metadata(&uploaded_file).unwrap().len(),
+        25 * 1024 * 1024
+    );
+
+    server_handle.abort();
+    let _ = std::fs::remove_dir_all(&out_dir);
+}
+
+#[tokio::test]
 async fn test_text_snippet_e2e() {
     let token = "testtok4".to_string();
     let snippet_text = "Secret Token: <token_1234>&abc";

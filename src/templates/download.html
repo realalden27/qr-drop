@@ -2,96 +2,259 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Download {{FILENAME}} - qr-drop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Download {{FILENAME}} · qr-drop</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
-      --subtext: #94a3b8;
-      --accent: #38bdf8;
-      --accent-hover: #0ea5e9;
-      --border: #334155;
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #09090b;
+      --card-bg: #131316;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-top: rgba(255, 255, 255, 0.14);
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --btn-bg: #f4f4f5;
+      --btn-text: #09090b;
+      --btn-hover: #ffffff;
+      --badge-bg: rgba(255, 255, 255, 0.06);
+      --badge-border: rgba(255, 255, 255, 0.1);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.15);
+    }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg);
-      color: var(--text);
+      color: var(--text-primary);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .wrapper {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 0.25rem;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+    .brand svg {
+      color: var(--text-secondary);
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.625rem;
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.01em;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-top-color: var(--card-border-top);
+      border-radius: 1.25rem;
+      padding: 2rem 1.75rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 36px -8px rgba(0, 0, 0, 0.7);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .file-icon-wrap {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 1.25rem;
+      border-radius: 1rem;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      border: 1px solid var(--card-border-top);
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 1rem;
+      color: var(--text-primary);
     }
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 2rem;
-      width: 100%;
-      max-width: 440px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-      text-align: center;
-    }
-    .icon {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      display: inline-block;
+    .ext-badge {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.35rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
     }
     .filename {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 600;
+      letter-spacing: -0.015em;
+      line-height: 1.4;
       word-break: break-all;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.375rem;
+      color: var(--text-primary);
     }
     .filesize {
-      color: var(--subtext);
-      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 400;
       margin-bottom: 1.75rem;
     }
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 0.5rem;
       width: 100%;
-      padding: 0.875rem 1.5rem;
-      background-color: var(--accent);
-      color: #0f172a;
+      padding: 0.875rem 1.25rem;
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-size: 0.95rem;
       font-weight: 600;
-      font-size: 1rem;
+      letter-spacing: -0.01em;
       border-radius: 0.75rem;
       text-decoration: none;
-      transition: background-color 0.15s ease;
       border: none;
       cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .btn:hover, .btn:active {
-      background-color: var(--accent-hover);
+    .btn:hover {
+      background: var(--btn-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
-    .footer {
-      margin-top: 1.5rem;
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    .btn.downloading {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      cursor: default;
+      transform: none;
+    }
+    .footer-note {
+      margin-top: 1.25rem;
       font-size: 0.75rem;
-      color: var(--subtext);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+    }
+    .footer-note svg {
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="icon">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  <div class="wrapper">
+    <div class="header-bar">
+      <div class="brand">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8h-9"/></svg>
+        <span>qr-drop</span>
+      </div>
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span>Direct P2P</span>
+      </div>
     </div>
-    <h1 class="filename">{{FILENAME}}</h1>
-    <div class="filesize">{{FILESIZE}}</div>
-    <a href="{{DOWNLOAD_URL}}" class="btn" id="dl-btn" download>Download File</a>
-    <div class="footer">Sent securely over local network via qr-drop</div>
+
+    <div class="card">
+      <div class="file-icon-wrap">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <span class="ext-badge" id="ext-badge">FILE</span>
+      </div>
+
+      <h1 class="filename" id="filename-el">{{FILENAME}}</h1>
+      <div class="filesize">{{FILESIZE}}</div>
+
+      <a href="{{DOWNLOAD_URL}}" class="btn" id="dl-btn" download>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span id="btn-text">Download File</span>
+      </a>
+
+      <div class="footer-note">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Local Wi-Fi transfer · Never touches cloud</span>
+      </div>
+    </div>
   </div>
+
   <script>
-    // Auto-trigger download after 600ms
+    const filename = document.getElementById('filename-el').textContent.trim();
+    const extMatch = filename.match(/\.([0-9a-z]+)$/i);
+    const badge = document.getElementById('ext-badge');
+    if (extMatch && extMatch[1]) {
+      badge.textContent = extMatch[1].toUpperCase().slice(0, 4);
+    } else {
+      badge.textContent = 'BIN';
+    }
+
+    const dlBtn = document.getElementById('dl-btn');
+    const btnText = document.getElementById('btn-text');
+
+    dlBtn.addEventListener('click', () => {
+      btnText.textContent = 'Downloading...';
+      dlBtn.classList.add('downloading');
+      setTimeout(() => {
+        btnText.textContent = 'Download Again';
+        dlBtn.classList.remove('downloading');
+      }, 3500);
+    });
+
+    // Auto-trigger download shortly after load
     setTimeout(() => {
-      document.getElementById('dl-btn').click();
-    }, 600);
+      dlBtn.click();
+    }, 400);
   </script>
 </body>
 </html>

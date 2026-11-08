@@ -5,6 +5,19 @@ All notable changes to `qr-drop` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2026-11-08
+
+### Fixed
+- **Upload Multipart Body Limit**: Disabled Axum's default 2 MiB request body limit (`DefaultBodyLimit::disable()`) on the receive route. Uploading files or photos larger than 2 MiB previously failed with `Chunk read error parsing 'multipart/form-data' request`. Large file uploads now stream directly to disk without hitting artificial payload limits.
+- **Incomplete Upload File Cleanup**: Clean up partially written files from disk if a transfer fails or disconnects mid-stream.
+
+### Added
+- **Upload Summary Display**: Web landing form now reflects the server's transfer response summary upon completion.
+- **Large File E2E Test**: Added regression test verifying large (25 MiB+) streaming file transfers.
+
+### Changed
+- **Modern Web Interface Redesign**: Overhauled all three web templates (`download.html`, `text.html`, `upload.html`) into a clean, professional monochromatic UI. Added automatic file extension badges, interactive upload queue with individual file removal, live uploaded-bytes progress counter, instant URL link detection for shared snippets, and mobile touch polish with zero external CDN dependencies.
+
 ## [0.1.4] - 2026-11-07
 
 ### Fixed

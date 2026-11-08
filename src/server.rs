@@ -2,6 +2,7 @@ use std::net::{IpAddr, SocketAddr};
 use std::path::PathBuf;
 
 use axum::Router;
+use axum::extract::DefaultBodyLimit;
 use axum::routing::get;
 use rand::Rng as _;
 use rand::distributions::Alphanumeric;
@@ -82,10 +83,12 @@ pub fn create_router(state: AppState) -> Router {
                 &format!("/d/{token}/raw"),
                 get(routes::download::raw_handler),
             ),
-        Payload::Receive { .. } => Router::new().route(
-            &format!("/u/{token}"),
-            get(routes::upload::page_handler).post(routes::upload::upload_handler),
-        ),
+        Payload::Receive { .. } => Router::new()
+            .route(
+                &format!("/u/{token}"),
+                get(routes::upload::page_handler).post(routes::upload::upload_handler),
+            )
+            .layer(DefaultBodyLimit::disable()),
         Payload::Text { .. } => {
             Router::new().route(&format!("/t/{token}"), get(routes::text::page_handler))
         },
